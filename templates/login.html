@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login • AI Companion</title>
+<style>
+  /* Importing all variables and background from your landing page */
+  :root{
+    --glass-bg: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.14);
+    --accent: #00ffff;
+    --accent-2: #8affc1;
+    --text: #e9f8ff;
+    --muted: rgba(254, 254, 254, 0.85);
+    --shadow: 0 10px 30px rgba(0,0,0,0.45);
+  }
+
+  body{
+    margin:0;
+    font-family: Inter, Poppins, system-ui;
+    background-color:#02060d;
+    background-image:
+    radial-gradient(circle at 20% 20%, rgba(0,255,255,0.18), transparent 55%),
+    radial-gradient(circle at 78% 0%, rgba(138,255,193,0.22), transparent 58%),
+    radial-gradient(circle at 50% 82%, rgba(0,110,255,0.32), transparent 55%),
+    linear-gradient(135deg, #03060f 0%, #040a16 35%, #03040a 100%);
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* Frosted Glass Auth Card */
+  .auth-card{
+    width: 380px;
+    padding: 32px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    backdrop-filter: blur(14px);
+    border:1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    text-align:center;
+  }
+
+  h2{
+    margin:0 0 18px;
+    font-size:1.8rem;
+    background: linear-gradient(120deg, var(--accent), var(--accent-2));
+    color: transparent;
+  }
+
+  .auth-card p{
+    color:var(--muted);
+    font-size:0.95rem;
+    margin-bottom:20px;
+  }
+
+  input{
+    width:90%;
+    padding:12px 14px;
+    margin-bottom:14px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color:var(--text);
+    font-size:0.95rem;
+  }
+  input:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 12px rgba(0,255,255,0.4);
+  }
+
+  .btn{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    font-weight:700;
+    cursor:pointer;
+    background: linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#001118;
+    transition:0.2s;
+  }
+  .btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 30px rgba(0,255,255,0.25);
+  }
+
+  .switch{
+    margin-top:18px;
+    color:var(--muted);
+    font-size:0.9rem;
+  }
+  .switch a{
+    color:var(--accent);
+    text-decoration:none;
+    font-weight:600;
+  }
+</style>
+</head>
+<body>
+
+<div class="auth-card" id="loginBox">
+  <h2>Welcome Back</h2>
+  <p>Login to continue your AI Companion journey.</p>
+  <input type="email" placeholder="Email" />
+  <input type="password" placeholder="Password" />
+  <button class="btn">Login</button>
+  <div class="switch">Don't have an account? <a href="#" onclick="toggleAuth()">Sign Up</a></div>
+</div>
+
+<div class="auth-card" id="signupBox" style="display:none;">
+  <h2>Create Account</h2>
+  <p>Join and start building futuristic UI instantly.</p>
+  <input type="text" placeholder="Full Name" />
+  <input type="email" placeholder="Email" />
+  <input type="password" placeholder="Password" />
+  <button class="btn">Sign Up</button>
+  <div class="switch">Already have an account? <a href="#" onclick="toggleAuth()">Login</a></div>
+</div>
+
+<script>
+function toggleAuth(){
+  const login = document.getElementById("loginBox");
+  const signup = document.getElementById("signupBox");
+  if(login.style.display === "none"){
+    login.style.display = "block";
+    signup.style.display = "none";
+  } else {
+    login.style.display = "none";
+    signup.style.display = "block";
+  }
+}
+
+
+
+function toggleAuth(){
+  const login = document.getElementById("loginBox");
+  const signup = document.getElementById("signupBox");
+  login.style.display = login.style.display === "none" ? "block" : "none";
+  signup.style.display = signup.style.display === "none" ? "block" : "none";
+}
+
+// LOGIN
+document.querySelector("#loginBox .btn").onclick = async () => {
+  const email = document.querySelector("#loginBox input[type='email']").value;
+  const pass = document.querySelector("#loginBox input[type='password']").value;
+
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password: pass })
+  });
+
+  const data = await res.json();
+  if (data.success) window.location.href = data.redirect;
+  else alert(data.message);
+};
+
+
+document.querySelector("#signupBox .btn").onclick = async () => {
+  const name = document.querySelector("#signupBox input[placeholder='Full Name']").value;
+  const email = document.querySelector("#signupBox input[placeholder='Email']").value;
+  const pass = document.querySelector("#signupBox input[placeholder='Password']").value;
+
+  const res = await fetch("/api/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password: pass })
+  });
+
+  const data = await res.json();
+  if (data.success) window.location.href = data.redirect;
+  else alert(data.message);
+};
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

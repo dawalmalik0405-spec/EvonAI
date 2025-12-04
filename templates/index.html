@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whiteboard2Web</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h3>🤖 AI Companion</h3>
+      <button id="toggleSidebar">⮜</button>
+    </div>
+
+    <div id="aiOutput" class="ai-output"></div>
+
+    <div class="ai-input-container">
+      <textarea id="aiInput" placeholder="Ask AI to refine your design...&#10;Examples:&#10;- 'Make the header gradient blue'&#10;- 'Add a signup form'&#10;- 'Change all buttons to rounded corners'"></textarea>
+
+
+
+      <div class="ai-actions">
+        <button id="sendPrompt" class="send-button">
+          <span class="button-icon">✨</span>
+          Send to AI
+        </button>
+        <label class="upload-btn">
+          <span class="button-icon">➕</span>
+          Upload Image
+          <input type="file" id="fileUpload" accept="image/*" hidden />
+        </label>
+      </div>
+          <button id="aiEnhanceBtn" class="send-button" style="margin-top:10px; background:#33323b; color: white; padding: 7px; border-radius: 10px;">
+            <span class="button-icon">⚡</span>
+            Enhance Design (AI)
+          </button>
+
+    </div>
+  </div>
+
+  <!-- Sidebar Handle - MOVED OUTSIDE THE SIDEBAR -->
+  <button id="sidebarHandle" class="sidebar-handle">🤖</button>
+
+  
+  <!-- Components Panel -->
+  <div id="componentPanel" class="components-panel"></div>
+
+  <!-- Components Panel Handle -->
+  <button id="componentPanelHandle" class="components-handle">📦</button>
+
+
+
+
+
+
+  <!-- Toolbar -->
+  <div id="toolbar" class="toolbar">
+    <div class="left">
+      <button class="tool" data-tool="select" title="Select (V)">🖱️</button>
+      <!-- Shapes Dropdown -->
+      <div class="tool-dropdown">
+        <button class="tool dropdown-trigger" title="Shapes" id="shapesDropdown">🔷 Shapes</button>
+        <div class="dropdown-content" id="shapesDropdownContent">
+          <button class="tool shape-option" data-tool="rectangle" title="Rectangle (R)">⬛ Rectangle</button>
+          
+
+          <button class="tool shape-option" data-tool="circle" title="Circle (C)">⚪ Circle</button>
+          <button class="tool shape-option" data-tool="triangle" title="Triangle">▲ Triangle</button>
+          <button class="tool shape-option" data-tool="line" title="Line (L)">➖ Line</button>
+          <button class="tool shape-option" data-tool="arrow" title="Arrow (A)">➡️ Arrow</button>
+          <button class="tool shape-option" data-tool="polygon" title="Polygon (P)">⬟ Polygon</button>
+        </div>
+        </div>
+        <button id="saveProjectBtn" title="Save Project">💾 Save Project</button>
+
+      <label class="tool inline">Stroke
+        <input id="strokeColorPicker" type="color" value="#000000">
+      </label>
+      <label class="tool inline">Fill
+        <input id="fillColorPicker" type="color" value="#000000">
+      </label>
+      <label class="tool inline">Size
+        <input id="thickness" type="range" min="1" max="12" value="2">
+      </label>
+      <label class="tool inline">Font
+        <input id="fontSize" type="range" min="10" max="72" value="20">
+      </label>
+
+      <button id="eraser" title="Delete Selected (Del)">🧽</button>
+      <button id="clear">🗑️ Clear</button>
+      <button id="save">💾 Save</button>
+    </div>
+
+    <div class="right">
+      <button id="zoomOut" title="Zoom Out (-)">🔍−</button>
+      <button id="zoomIn" title="Zoom In (+)">🔍+</button>
+      <button id="zoomToArea" title="Zoom to Area (Z)">🎯</button>
+      <button id="zoomReset" title="Reset Zoom (0)">100%</button>
+      <button id="toggleToolbar" title="Toggle Toolbar (H)">↕️</button>
+      <button id="themeToggle" title="Toggle Theme">🌙</button>
+      <button id="generate">⚙️ Generate</button>
+      <!-- <button id="preview">👁️ Preview</button> -->
+    </div>
+  </div>
+
+  <!-- Workspace -->
+  <div class="workspace">
+    <canvas id="whiteboard"></canvas>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get("project_id");
+    let currentProject = projectId || null;
+
+    // LOAD PROJECT
+    if (currentProject) {
+        fetch(`/api/projects/${currentProject}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.project.design) {
+                    canvas.loadFromJSON(data.project.design, canvas.renderAll.bind(canvas));
+                }
+            });
+    }
+
+    // SAVE PROJECT
+    document.getElementById("save").addEventListener("click", async () => {
+        const design = canvas.toJSON();
+        const title = prompt("Enter project title:", "New Project");
+
+        const response = await fetch("/api/projects/save", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                project_id: currentProject,
+                title: title,
+                design: design
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            currentProject = data.project_id;
+            alert("Project saved!");
+        }
+    });
+  </script>
+  <script src="/static/script.js"></script>
+  <script src="/static/component.js"> </script>
+  
+</body>
+</html>

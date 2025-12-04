@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Code - Whiteboard2Web</title>
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --sidebar: #252526;
+            --editor: #1e1e1e;
+            --accent: #007acc;
+            --text: #d4d4d4;
+            --border: #3e3e42;
+            --success: #4cc9f0;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* File Tree */
+        .file-tree {
+            width: 280px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .file-tree-header {
+            margin-bottom: 20px;
+        }
+        
+        .file-tree h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .project-info {
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .features-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0;
+        }
+        
+        .feature-tag {
+            background: var(--accent);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .feature-tag.functional {
+            background: var(--success);
+        }
+        
+        .feature-tag.responsive {
+            background: #2ecc71;
+        }
+        
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            padding: 10px 12px;
+            margin: 4px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .file-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .file-item.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .file-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .file-size {
+            margin-left: auto;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .file-type {
+            font-size: 0.7rem;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        /* Code Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .editor-header {
+            padding: 15px 20px;
+            background: var(--sidebar);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-tabs {
+            display: flex;
+            gap: 2px;
+            overflow-x: auto;
+            flex: 1;
+        }
+        
+        .file-tab {
+            padding: 8px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            white-space: nowrap;
+            min-width: 120px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .file-tab.active {
+            background: var(--editor);
+            border-bottom: 1px solid var(--editor);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-left: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            background: #005a9e;
+        }
+        
+        .btn-secondary {
+            background: #4d4d4d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5d5d5d;
+        }
+        
+        .btn-success {
+            background: #2ecc71;
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+        }
+        
+        /* Code Editor */
+        .code-editor {
+            flex: 1;
+            display: flex;
+        }
+        
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .editor-wrapper {
+            flex: 1;
+            position: relative;
+            overflow-y: auto !important;
+            overflow-x: auto !important;
+            max-height: 85vh;
+        }
+
+        
+        .editor {
+            background: var(--editor);
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre;
+            tab-size: 2;
+            min-height: 100%;
+            white-space: pre;
+        }
+        
+        .preview-pane {
+            flex: 1;
+            border-left: 1px solid var(--border);
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .preview-header {
+            padding: 12px 20px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-header h4 {
+            color: #333;
+            margin: 0;
+        }
+        
+        .preview-iframe {
+            flex: 1;
+            border: none;
+            background: white;
+        }
+        
+        /* Syntax Highlighting */
+        .html-tag { color: #569cd6; }
+        .html-attr { color: #9cdcfe; }
+        .html-value { color: #ce9178; }
+        .css-selector { color: #d7ba7d; }
+        .css-property { color: #9cdcfe; }
+        .css-value { color: #ce9178; }
+        .js-keyword { color: #569cd6; }
+        .js-string { color: #ce9178; }
+        .js-function { color: #dcdcaa; }
+        .js-number { color: #b5cea8; }
+        .js-comment { color: #6a9955; }
+        
+        /* Instructions Panel */
+        .instructions-panel {
+            background: rgba(0,122,204,0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 20px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .instructions-panel h4 {
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            padding: 6px 20px;
+            background: var(--sidebar);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .file-tree {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .code-editor {
+                flex-direction: column;
+            }
+            
+            .preview-pane {
+                border-left: none;
+                border-top: 1px solid var(--border);
+                height: 300px;
+            }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- File Tree Sidebar -->
+        <div class="file-tree">
+            <div class="file-tree-header">
+                <h3>📁 Project Files</h3>
+                <div class="project-info" id="projectInfo">
+                    <!-- Project info will be populated -->
+                </div>
+            </div>
+            <div class="file-list" id="fileList">
+                <!-- Files will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Main Editor Area -->
+        <div class="editor-area">
+            <div class="editor-header">
+                <div class="file-tabs" id="fileTabs">
+                    <!-- Tabs will be populated by JavaScript -->
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="runLivePreview()">
+                        ▶️ Run Preview
+                    </button>
+                    <button class="btn" onclick="downloadAllFiles()">
+                        📥 Download All
+                    </button>
+                    <button class="btn btn-secondary" onclick="goBackToDesigner()">
+                        ← Back to Designer
+                    </button>
+                </div>
+            </div>
+            
+            <div class="code-editor">
+                <div class="editor-container">
+                    <div class="instructions-panel" id="instructionsPanel">
+                        <!-- Instructions will be populated -->
+                    </div>
+                    <div class="editor-wrapper">
+                        <pre class="editor" id="codeEditor">
+                            <!-- Code will be displayed here -->
+                        </pre>
+                    </div>
+                </div>
+                <div class="preview-pane">
+                    <div class="preview-header">
+                        <h4>🔍 Live Preview</h4>
+                        <button class="btn" onclick="refreshPreview()" style="padding: 4px 12px; font-size: 0.8rem;">
+                            ↻ Refresh
+                        </button>
+                    </div>
+                    <iframe id="livePreview" class="preview-iframe" title="Live Preview"></iframe>
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <div class="status-item" id="statusInfo">
+                    <!-- Status info -->
+                </div>
+                <div class="status-item">
+                    <span id="currentFile">No file selected</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced code display with multiple file support
+        let codeData = {};
+        let currentFile = '';
+        let allFiles = [];
+        
+        // Initialize the code display
+        function initializeCodeDisplay() {
+            console.log("Initializing enhanced code display...");
+            
+            // Get code data from session storage
+            const storedCode = sessionStorage.getItem('generatedCode');
+            
+            if (storedCode) {
+                try {
+                    codeData = JSON.parse(storedCode);
+                    console.log("Code data loaded:", codeData);
+                    
+                    // Extract files from project_structure
+                    if (codeData.project_structure && Array.isArray(codeData.project_structure)) {
+                        allFiles = codeData.project_structure;
+                        console.log(`Found ${allFiles.length} files in project structure`);
+                    } else {
+                        // Fallback: create project structure from main files
+                        allFiles = createProjectStructureFromLegacy(codeData);
+                    }
+                    
+                    renderProjectInfo();
+                    renderFileTree();
+                    renderFileTabs();
+                    
+                    // Load first file
+                    if (allFiles.length > 0) {
+                        loadFile(allFiles[0].file);
+                    }
+                    
+                    // Show instructions
+                    renderInstructions();
+                    
+                    // Update status
+                    updateStatus();
+                    
+                    // Auto-run preview after 1 second
+                    setTimeout(runLivePreview, 1000);
+                    
+                } catch (error) {
+                    console.error("Error parsing code data:", error);
+                    showError("Failed to parse generated code");
+                }
+            } else {
+                showError("No code data found. Please generate code from the designer.");
+            }
+        }
+        
+        // Create project structure from legacy format
+        function createProjectStructureFromLegacy(codeData) {
+            const files = [];
+            
+            // Add HTML files
+            if (codeData.html) {
+                files.push({
+                    file: 'index.html',
+                    content: codeData.html,
+                    type: 'html'
+                });
+            }
+            
+            if (codeData.main_html && codeData.main_html !== codeData.html) {
+                files.push({
+                    file: 'index.html',
+                    content: codeData.main_html,
+                    type: 'html'
+                });
+            }
+            
+            // Add CSS files
+            if (codeData.css) {
+                files.push({
+                    file: 'styles.css',
+                    content: codeData.css,
+                    type: 'css'
+                });
+            }
+            
+            if (codeData.main_css && codeData.main_css !== codeData.css) {
+                files.push({
+                    file: 'styles.css',
+                    content: codeData.main_css,
+                    type: 'css'
+                });
+            }
+            
+            // Add JS files
+            if (codeData.javascript) {
+                files.push({
+                    file: 'script.js',
+                    content: codeData.javascript,
+                    type: 'js'
+                });
+            }
+            
+            if (codeData.main_js && codeData.main_js !== codeData.javascript) {
+                files.push({
+                    file: 'script.js',
+                    content: codeData.main_js,
+                    type: 'js'
+                });
+            }
+            
+            // Add any additional files from codeData
+            for (const key in codeData) {
+                if (key.endsWith('.html') || key.endsWith('.css') || key.endsWith('.js')) {
+                    files.push({
+                        file: key,
+                        content: codeData[key],
+                        type: key.split('.').pop()
+                    });
+                }
+            }
+            
+            return files;
+        }
+        
+        // Render project information
+        function renderProjectInfo() {
+            const projectInfo = document.getElementById('projectInfo');
+            
+            let html = '';
+            
+            // Layout type
+            if (codeData.layout_type) {
+                html += `<div><strong>Layout:</strong> ${codeData.layout_type}</div>`;
+            }
+            
+            // Features
+            if (codeData.functional_features && codeData.functional_features.length > 0) {
+                html += `<div><strong>Features:</strong></div>
+                        <div class="features-list">`;
+                
+                codeData.functional_features.forEach(feature => {
+                    const featureClass = getFeatureClass(feature);
+                    html += `<span class="feature-tag ${featureClass}">${feature}</span>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // File count
+            html += `<div><strong>Files:</strong> ${allFiles.length}</div>`;
+            
+            projectInfo.innerHTML = html;
+        }
+        
+        function getFeatureClass(feature) {
+            const functionalFeatures = ['buttons', 'forms', 'navigation', 'validation', 'interactive'];
+            if (functionalFeatures.includes(feature)) return 'functional';
+            if (feature === 'responsive') return 'responsive';
+            return '';
+        }
+        
+        // Render file tree
+        function renderFileTree() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            // Group files by type
+            const htmlFiles = allFiles.filter(f => f.type === 'html' || f.file.endsWith('.html'));
+            const cssFiles = allFiles.filter(f => f.type === 'css' || f.file.endsWith('.css'));
+            const jsFiles = allFiles.filter(f => f.type === 'js' || f.file.endsWith('.js'));
+            const otherFiles = allFiles.filter(f => 
+                !f.file.endsWith('.html') && 
+                !f.file.endsWith('.css') && 
+                !f.file.endsWith('.js')
+            );
+            
+            // Render HTML files
+            if (htmlFiles.length > 0) {
+                renderFileGroup(fileList, '📄 HTML Files', htmlFiles);
+            }
+            
+            // Render CSS files
+            if (cssFiles.length > 0) {
+                renderFileGroup(fileList, '🎨 CSS Files', cssFiles);
+            }
+            
+            // Render JS files
+            if (jsFiles.length > 0) {
+                renderFileGroup(fileList, '⚡ JavaScript Files', jsFiles);
+            }
+            
+            // Render other files
+            if (otherFiles.length > 0) {
+                renderFileGroup(fileList, '📁 Other Files', otherFiles);
+            }
+        }
+        
+        function renderFileGroup(container, title, files) {
+            const group = document.createElement('div');
+            group.className = 'file-group';
+            
+            const header = document.createElement('div');
+            header.style.cssText = 'font-size: 0.8rem; color: #aaa; margin: 15px 0 5px 0; padding-left: 5px;';
+            header.textContent = title;
+            group.appendChild(header);
+            
+            files.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = `file-item ${file.file === currentFile ? 'active' : ''}`;
+                
+                // Get appropriate icon
+                const icon = getFileIcon(file.file);
+                const fileSize = file.content ? Math.ceil(file.content.length / 1024) : 0;
+                
+                fileItem.innerHTML = `
+                    <span class="file-icon">${icon}</span>
+                    <span class="file-name">${file.file}</span>
+                    <span class="file-size">${fileSize}KB</span>
+                `;
+                
+                fileItem.onclick = () => {
+                    document.querySelectorAll('.file-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    fileItem.classList.add('active');
+                    loadFile(file.file);
+                };
+                
+                group.appendChild(fileItem);
+            });
+            
+            container.appendChild(group);
+        }
+        
+        function getFileIcon(filename) {
+            if (filename.endsWith('.html')) return '📄';
+            if (filename.endsWith('.css')) return '🎨';
+            if (filename.endsWith('.js')) return '⚡';
+            if (filename.endsWith('.json')) return '📋';
+            if (filename.endsWith('.md')) return '📝';
+            if (filename.endsWith('.png') || filename.endsWith('.jpg')) return '🖼️';
+            return '📁';
+        }
+        
+        // Render file tabs
+        function renderFileTabs() {
+            const fileTabs = document.getElementById('fileTabs');
+            fileTabs.innerHTML = '';
+            
+            // Only show first 5 files in tabs for simplicity
+            const filesToShow = allFiles.slice(0, 5);
+            
+            filesToShow.forEach(file => {
+                const tab = document.createElement('div');
+                tab.className = `file-tab ${file.file === currentFile ? 'active' : ''}`;
+                tab.textContent = file.file;
+                tab.title = file.file;
+                
+                tab.onclick = () => {
+                    document.querySelectorAll('.file-tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    tab.classList.add('active');
+                    loadFile(file.file);
+                };
+                
+                fileTabs.appendChild(tab);
+            });
+            
+            // Add "More..." tab if there are more files
+            if (allFiles.length > 5) {
+                const moreTab = document.createElement('div');
+                moreTab.className = 'file-tab';
+                moreTab.textContent = `+${allFiles.length - 5} more`;
+                moreTab.title = 'Click file tree to see all files';
+                fileTabs.appendChild(moreTab);
+            }
+        }
+        
+        // Load and display file content
+        function loadFile(filename) {
+            currentFile = filename;
+            
+            const editor = document.getElementById('codeEditor');
+            const file = allFiles.find(f => f.file === filename);
+            
+            if (!file) {
+                editor.textContent = `// File not found: ${filename}`;
+                return;
+            }
+            
+            const content = file.content || '';
+            editor.innerHTML = syntaxHighlight(content, filename);
+            
+            // Update active states
+            renderFileTree();
+            renderFileTabs();
+            
+            // Update status bar
+            document.getElementById('currentFile').textContent = filename;
+            
+            // Update file type indicator
+            updateStatus();
+        }
+        
+        // Enhanced syntax highlighting
+        function syntaxHighlight(code, filename) {
+            if (filename.endsWith('.html')) {
+                return highlightHTML(code);
+            } else if (filename.endsWith('.css')) {
+                return highlightCSS(code);
+            } else if (filename.endsWith('.js')) {
+                return highlightJS(code);
+            } else {
+                return escapeHTML(code);
+            }
+        }
+        
+        function escapeHTML(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+        
+        function highlightHTML(code) {
+            return escapeHTML(code)
+                .replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*)/g, '$1<span class="html-tag">$2</span>')
+                .replace(/([a-zA-Z-]+)(?=\s*=\s*["'])/g, '<span class="html-attr">$1</span>')
+                .replace(/("[^"]*"|'[^']*')/g, '<span class="html-value">$1</span>')
+                .replace(/&lt;!--[\s\S]*?--&gt;/g, '<span class="js-comment">$&</span>');
+        }
+        
+        function highlightCSS(code) {
+            return escapeHTML(code)
+                .replace(/([^{}]+)(?=\{)/g, '<span class="css-selector">$1</span>')
+                .replace(/([a-zA-Z-]+)(?=:)/g, '<span class="css-property">$1</span>')
+                .replace(/(:\s*)([^;]+)/g, '$1<span class="css-value">$2</span>')
+                .replace(/\/\*[\s\S]*?\*\//g, '<span class="js-comment">$&</span>');
+        }
+        
+        function highlightJS(code) {
+            return escapeHTML(code)
+                .replace(/\b(function|return|const|let|var|if|else|for|while|class|export|import|async|await|try|catch|finally)\b/g, 
+                        '<span class="js-keyword">$1</span>')
+                .replace(/("([^"]*)"|'([^']*)')/g, '<span class="js-string">$1</span>')
+                .replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\()/g, '<span class="js-function">$1</span>')
+                .replace(/\b\d+\b/g, '<span class="js-number">$&</span>')
+                .replace(/\/\/[^\n]*/g, '<span class="js-comment">$&</span>')
+                .replace(/\/\*[\s\S]*?\*\//g, '<span class="js-comment">$&</span>');
+        }
+        
+        // Render instructions
+        function renderInstructions() {
+            const panel = document.getElementById('instructionsPanel');
+            
+            let html = '<h4>📋 Instructions</h4>';
+            
+            if (codeData.instructions) {
+                html += `<p>${codeData.instructions.replace(/\n/g, '<br>')}</p>`;
+            } else {
+                html += `<p>1. Save all files in the same directory<br>
+                         2. Open index.html in a web browser<br>
+                         3. Test all interactive features</p>`;
+            }
+            
+            if (codeData.explanation) {
+                html += `<p><strong>Description:</strong> ${codeData.explanation}</p>`;
+            }
+            
+            if (codeData.dependencies && codeData.dependencies.length > 0) {
+                html += `<p><strong>Dependencies:</strong> ${codeData.dependencies.join(', ')}</p>`;
+            }
+            
+            panel.innerHTML = html;
+        }
+        
+        // Update status bar
+        function updateStatus() {
+            const statusInfo = document.getElementById('statusInfo');
+            
+            let html = '';
+            
+            // File type
+            if (currentFile) {
+                const fileType = currentFile.split('.').pop().toUpperCase();
+                html += `<span>${fileType}</span>`;
+            }
+            
+            // Feature count
+            if (codeData.functional_features) {
+                const funcCount = codeData.functional_features.filter(f => 
+                    ['buttons', 'forms', 'navigation', 'interactive'].includes(f)
+                ).length;
+                html += `<span> • ${funcCount} functional features</span>`;
+            }
+            
+            statusInfo.innerHTML = html;
+        }
+        
+        // Run live preview
+        function runLivePreview() {
+            const iframe = document.getElementById('livePreview');
+            
+            // Find the main HTML file
+            const htmlFiles = allFiles.filter(f => f.file.endsWith('.html'));
+            const mainHtmlFile = htmlFiles.find(f => f.file === 'index.html') || 
+                               htmlFiles.find(f => f.file.includes('main')) || 
+                               htmlFiles[0];
+            
+            if (!mainHtmlFile) {
+                showError("No HTML file found for preview");
+                return;
+            }
+            
+            // Find CSS and JS files
+            const cssFiles = allFiles.filter(f => f.file.endsWith('.css'));
+            const jsFiles = allFiles.filter(f => f.file.endsWith('.js'));
+            
+            // Create complete HTML document
+            let htmlContent = mainHtmlFile.content;
+            
+            // Inject CSS if not already linked
+            cssFiles.forEach(cssFile => {
+                if (!htmlContent.includes(cssFile.file)) {
+                    const cssLink = `\n    <link rel="stylesheet" href="${cssFile.file}">`;
+                    htmlContent = htmlContent.replace('</head>', cssLink + '\n    </head>');
+                }
+            });
+            
+            // Inject JS if not already linked
+            jsFiles.forEach(jsFile => {
+                if (!htmlContent.includes(jsFile.file)) {
+                    const jsScript = `\n    <script src="${jsFile.file}"><\/script>`;
+                    htmlContent = htmlContent.replace('</body>', jsScript + '\n    </body>');
+                }
+            });
+            
+            // Add a console message
+            const consoleScript = `
+                <script>
+                    console.log('🚀 Whiteboard2Web Live Preview');
+                    console.log('📁 Project: ${codeData.layout_type || 'Generated Website'}');
+                    console.log('⚡ Features: ${codeData.functional_features ? codeData.functional_features.join(', ') : 'All functional'}');
+                <\/script>
+            `;
+            htmlContent = htmlContent.replace('</body>', consoleScript + '\n    </body>');
+            
+            // Set iframe content
+            iframe.srcdoc = htmlContent;
+            
+            console.log("Live preview started with:", mainHtmlFile.file);
+        }
+        
+        function refreshPreview() {
+            runLivePreview();
+        }
+        
+        // Download all files as zip
+        function downloadAllFiles() {
+            if (!allFiles || allFiles.length === 0) {
+                showError("No files to download");
+                return;
+            }
+            
+            // Create a Blob for each file and trigger download
+            allFiles.forEach((file, index) => {
+                setTimeout(() => {
+                    downloadFile(file.file, file.content);
+                }, index * 100);
+            });
+            
+            // Show success message
+            alert(`Downloading ${allFiles.length} files... Check your downloads folder.`);
+            
+            // Also create a README file
+            const readmeContent = generateReadme();
+            setTimeout(() => {
+                downloadFile('README.md', readmeContent);
+            }, allFiles.length * 100);
+        }
+        
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: getMimeType(filename) });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function getMimeType(filename) {
+            if (filename.endsWith('.html')) return 'text/html';
+            if (filename.endsWith('.css')) return 'text/css';
+            if (filename.endsWith('.js')) return 'application/javascript';
+            if (filename.endsWith('.json')) return 'application/json';
+            return 'text/plain';
+        }
+        
+        function generateReadme() {
+            return `# Generated by Whiteboard2Web
+
+## Project Information
+- Layout Type: ${codeData.layout_type || 'Web Design'}
+- Generated: ${new Date().toLocaleString()}
+- Features: ${codeData.functional_features ? codeData.functional_features.join(', ') : 'Responsive, Interactive'}
+
+## How to Run
+1. Place all files in the same directory
+2. Open ${allFiles.find(f => f.file.endsWith('.html'))?.file || 'index.html'} in a web browser
+3. All interactive features should work immediately
+
+## Files
+${allFiles.map(f => `- ${f.file}`).join('\n')}
+
+## Notes
+${codeData.explanation || 'Generated from visual design using Whiteboard2Web AI.'}
+
+## Testing
+- Test all buttons and forms
+- Verify responsive design
+- Check console for any errors
+
+Enjoy your fully functional website! 🚀
+`;
+        }
+        
+        // Go back to designer
+        function goBackToDesigner() {
+            window.location.href = '/';
+        }
+        
+        // Show error message
+        function showError(message) {
+            const editor = document.getElementById('codeEditor');
+            editor.innerHTML = `<div style="color: #ff6b6b; padding: 20px; font-family: sans-serif;">
+                <h3>❌ Error</h3>
+                <p>${message}</p>
+                <button onclick="goBackToDesigner()" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    ← Back to Designer
+                </button>
+            </div>`;
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeCodeDisplay);
+    </script>
+</body>
+</html>

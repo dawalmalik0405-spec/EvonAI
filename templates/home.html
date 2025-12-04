@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Companion – Futuristic Landing Page</title>
+
+<style>
+  /* -------------------------
+     Base / Reset / Typography
+     ------------------------- */
+  :root{
+    --glass-bg: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.14);
+    --accent: #00ffff;
+    --accent-2: #8affc1;
+    --text: #e9f8ff;
+    --muted: rgba(255,255,255,0.85);
+    --shadow: 0 10px 30px rgba(0,0,0,0.45);
+  }
+
+  /* Dark / Light themes */
+  body.light {
+    --glass-bg: rgba(10,10,12,0.85);
+    --glass-border: rgba(255,255,255,0.06);
+    --accent: #7ad3ff;
+    --accent-2: #ffd97a;
+    --text: #0b1020;
+    --muted: rgba(12,12,12,0.9);
+    background: linear-gradient(120deg,#f6f9ff,#fff8ec);
+    color: var(--text);
+  }
+
+  html,body{height:100%;margin:0;scroll-behavior:smooth;font-family:Inter, Poppins, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue";-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+
+  /* Animated gradient background */
+  body{
+    overflow-x:hidden;
+    color:var(--text);
+    background-color:#02060d;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(0,255,255,0.18), transparent 55%),
+      radial-gradient(circle at 78% 0%, rgba(138,255,193,0.22), transparent 58%),
+      radial-gradient(circle at 50% 82%, rgba(0,110,255,0.32), transparent 55%),
+      linear-gradient(135deg, #03060f 0%, #040a16 35%, #03040a 100%);
+    background-size: 150% 150%, 180% 180%, 190% 190%, 100% 100%;
+    animation: bgShift 18s ease-in-out infinite;
+    position:relative;
+  }
+  body::before,
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+  }
+  body::before{
+    inset:-40% -20% auto -20%;
+    height:220%;
+    background: conic-gradient(from 120deg, rgba(0,255,255,0.6), rgba(0,120,255,0.25), rgba(120,0,255,0.35), rgba(0,255,255,0.6));
+    filter: blur(140px);
+    opacity:0.35;
+    mix-blend-mode:screen;
+    /* rotation disabled */
+    z-index:-3;
+  }
+  body::after{
+    background-image:
+      repeating-linear-gradient(90deg, rgba(0,255,255,0.06) 0 1px, transparent 1px 80px),
+      repeating-linear-gradient(180deg, rgba(0,140,255,0.05) 0 1px, transparent 1px 80px);
+    opacity:0.18;
+    mix-blend-mode:screen;
+    animation: gridPulse 14s ease-in-out infinite;
+    z-index:-2;
+  }
+  @keyframes bgShift{
+    0%{background-position:20% 50%, 80% 30%, 50% 80%, 0% 50%}
+    50%{background-position:80% 40%, 20% 60%, 60% 20%, 100% 50%}
+    100%{background-position:20% 50%, 80% 30%, 50% 80%, 0% 50%}
+  }
+  @keyframes auroraDrift{
+    0%{transform:translate3d(0,0,0) rotate(0deg);}
+    50%{transform:translate3d(6%, -4%, 0) rotate(160deg);}
+    100%{transform:translate3d(0,0,0) rotate(360deg);}
+  }
+  @keyframes gridPulse{
+    0%,100%{opacity:0.12; filter: hue-rotate(0deg);}
+    50%{opacity:0.3; filter: hue-rotate(20deg);}
+  }
+
+  /* Particle canvas sits under content */
+  #particleCanvas{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+  /* Floating neon shapes */
+  .neon-shape{
+    position:fixed;
+    z-index:1;
+    filter: blur(10px) saturate(120%);
+    opacity:0.6;
+    mix-blend-mode:screen;
+    pointer-events:none;
+    will-change: transform, opacity;
+  }
+  .shape-a{width:220px;height:220px;border-radius:28px; background:linear-gradient(180deg, rgba(0,255,255,0.18), rgba(138,255,193,0.06)); left:-40px; top:120px; animation: floatA 8s ease-in-out infinite;}
+  .shape-b{width:140px;height:140px;border-radius:50%; background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(122,211,255,0.14)); right:-30px; top:220px; animation: floatB 9s ease-in-out infinite;}
+  .shape-c{width:320px;height:120px;border-radius:28px; background:linear-gradient(90deg, rgba(255,200,120,0.06), rgba(0,255,255,0.06)); left:10%; bottom:8%; animation: floatC 11s ease-in-out infinite;}
+
+  @keyframes floatA{ 0%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-16px) rotate(6deg)} 100%{transform:translateY(0)} }
+  @keyframes floatB{ 0%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-10px) rotate(-4deg)} 100%{transform:translateY(0)} }
+  @keyframes floatC{ 0%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-20px) rotate(4deg)} 100%{transform:translateY(0)} }
+
+  /* Header */
+  header{
+    position:fixed; top:0; left:0; right:0; height:72px; display:flex; align-items:center; justify-content:space-between; padding:0 28px; gap:16px;
+    z-index:40; backdrop-filter: blur(8px); background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+    border-bottom:1px solid var(--glass-border);
+  }
+  header .brand{ display:flex; align-items:center; gap:12px; }
+  header h2{ font-size:1.05rem; color:var(--text); letter-spacing:0.2px; margin:0; text-shadow:0 6px 18px rgba(0,0,0,0.35);}
+  .controls{ display:flex; align-items:center; gap:12px; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:10px; padding:10px 16px; border-radius:999px; border:1px solid var(--glass-border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color:var(--text); text-decoration:none; font-weight:600; cursor:pointer;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s;
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn.accent{ background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#001018; box-shadow:0 10px 30px rgba(0,255,255,0.08); border: none; }
+
+  /* Menu toggle (three-line icon) */
+  #menuToggle{
+    display:inline-grid;
+    place-items:center;
+    width:46px;
+    height:46px;
+    border-radius:10px;
+    border:1px solid var(--glass-border);
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    cursor:pointer;
+    margin-right:8px;
+  }
+  #menuIcon{ font-size:18px; color:var(--text); line-height:1; }
+
+  /* Sidebar + overlay */
+  .overlay {
+    position:fixed; inset:0; background:rgba(2,6,9,0.55); opacity:0; pointer-events:none; transition:opacity .32s ease; z-index:35;
+    backdrop-filter: blur(4px);
+  }
+  .overlay.open { opacity:1; pointer-events:auto; }
+
+  .sidebar {
+    position:fixed; top:0; left:0; height:100vh; width:300px; max-width:86vw;
+    background: linear-gradient(180deg, rgba(10,12,14,0.85), rgba(6,10,14,0.72)); color:var(--text);
+    border-right:1px solid rgba(255,255,255,0.04); box-shadow: 12px 40px 80px rgba(0,0,0,0.6);
+    transform: translateX(-110%); transition: transform .38s cubic-bezier(.16,.9,.25,1);
+    z-index:45; padding:22px 16px; display:flex; flex-direction:column; gap:18px; backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .sidebar .top {
+    display:flex; align-items:center; gap:12px; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.03);
+  }
+  .sidebar .brand-mini svg{ width:44px; height:44px; border-radius:8px; overflow:hidden; display:block; }
+  .sidebar h3 { margin:0; font-size:1.05rem; color:var(--text); }
+
+  .nav {
+    margin-top:6px; display:flex; flex-direction:column; gap:8px;
+  }
+  .nav a {
+    display:flex; align-items:center; gap:12px; padding:12px 10px; border-radius:10px; color:var(--text); text-decoration:none;
+    transition: background .15s ease, transform .12s;
+  }
+  .nav a:hover { background: rgba(255,255,255,0.02); transform: translateX(4px); }
+  .nav a .icon { width:36px; height:36px; display:inline-grid; place-items:center; border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); }
+
+  .sidebar .spacer{ flex:1; }
+
+  .sidebar .login-btn {
+    display:block; margin-top:8px; padding:10px 12px; border-radius:10px; text-align:center; text-decoration:none; font-weight:700;
+    background: linear-gradient(90deg, rgba(0,255,255,0.08), rgba(138,255,193,0.04)); border:1px solid rgba(0,255,255,0.06); color:var(--text);
+  }
+
+  /* small devices: make sidebar full width */
+  @media (max-width:640px){
+    .sidebar { width:86vw; }
+  }
+
+  /* Layout container */
+  main{ position:relative; z-index:10; padding:0 20px; max-width:1200px; margin:0 auto; }
+
+  /* Hero card */
+ .hero {
+    min-height: calc(100vh - 72px - 110px - 120px); /* full height minus header and hero paddings */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;   /* vertical center */
+    align-items: center;       /* horizontal center */
+
+    padding: 110px 20px 120px;
+    text-align: center;
+}
+
+/* your existing text styles */
+.hero h1 {
+    font-size: 2.6rem;
+    margin: 0 0 12px;
+    letter-spacing: -1px;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 6px 28px rgba(0, 255, 255, 0.18);
+    background: linear-gradient(120deg, rgba(233,248,255,0.95), rgba(0,255,255,0.95), rgba(138,255,193,0.9));
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: heroGlow 3.6s ease-in-out infinite;
+}
+
+.hero p {
+    color: rgba(233, 248, 255, 0.9);
+    font-size: 1.06rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    backdrop-filter: blur(4px);
+    background: linear-gradient(145deg, rgba(2,8,20,0.55), rgba(2,8,20,0.2));
+    border-radius: 18px;
+    padding: 14px 22px 18px;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* your button row */
+.hero-row {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+
+  /* Features section */
+  .features { margin-top:48px; display:grid; gap:28px; scroll-margin-top: 96px; }
+
+  /* White text-blending animations */
+  @keyframes heroGlow {
+    0%, 100% { text-shadow: 0 0 0 rgba(255,255,255,0), 0 6px 30px rgba(0, 255, 255, 0.06); }
+    50% { text-shadow: 0 0 18px rgba(255,255,255,0.35), 0 6px 30px rgba(0, 255, 255, 0.06); }
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); opacity:0; }
+    20% { opacity:.5; }
+    100% { transform: translateX(120%); opacity:0; }
+  }
+
+  .hero h1::after {
+    content: "";
+    position: absolute;
+    top: 0; left: -20%;
+    height: 100%; width: 40%;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.22), rgba(255,255,255,0));
+    transform: skewX(-20deg);
+    animation: shimmer 4.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .hero p::after {
+    content: "";
+    position: absolute;
+    left: 22px; right: 22px; bottom: 14px; height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.65), rgba(255,255,255,0));
+    opacity: .6;
+    animation: heroUnderline 3.8s ease-in-out infinite;
+  }
+  @keyframes heroUnderline {
+    0%, 100% { opacity: .25; }
+    50% { opacity: .75; }
+  }
+  .feature {
+    display:flex; gap:26px; align-items:center; padding:24px; border-radius:14px; border:1px solid var(--glass-border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    transform: translateY(40px); opacity:0; transition:opacity 800ms ease, transform 800ms ease;
+    backdrop-filter: blur(10px);
+  }
+  .feature.show{ transform: translateY(0); opacity:1; }
+  .feature .text{ flex:1; }
+  .feature h3{ margin:0 0 8px; font-size:1.3rem; color:var(--text); text-shadow:0 6px 18px rgba(0,0,0,0.25); }
+  .feature p{ margin:0; color:var(--muted); line-height:1.6; font-size:0.98rem; }
+
+  /* Carousel (right side) */
+  .carousel {
+    width:520px; max-width:100%; position:relative; border-radius:12px; overflow:hidden; flex-shrink:0; align-self:stretch;
+    border:1px solid rgba(255,255,255,0.06); background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+  }
+
+  .slides { display:flex; transition:transform 700ms cubic-bezier(.22,.9,.3,1); will-change:transform; }
+  .slide { min-width:100%; display:block; padding:18px; box-sizing:border-box; }
+  .slide img{ width:100%; height:420px; object-fit:cover; border-radius:10px; box-shadow:0 18px 60px rgba(0,0,0,0.45); transition:transform .9s ease, filter .6s; transform:scale(.98); filter:brightness(.98) saturate(1.02); }
+  .slide.active img{ transform:scale(1); filter:brightness(1.02) saturate(1.05); }
+
+  /* carousel controls */
+  .carousel .arrow{
+    position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%; border:1px solid var(--glass-border); background:rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .carousel .arrow.left{ left:12px; }
+  .carousel .arrow.right{ right:12px; }
+  .carousel .dots{ position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .carousel .dot{ width:10px;height:10px;border-radius:50%; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.06); cursor:pointer; }
+  .carousel .dot.active{ background:var(--accent); box-shadow:0 6px 18px rgba(0,255,255,0.14); }
+
+  /* Responsive adjustments */
+  @media (max-width:980px){
+    .feature{ flex-direction:column; padding:18px; }
+    .carousel{ order:-1; width:100%; }
+    .slide img{ height:300px; }
+    .hero h1{ font-size:2rem; }
+    .hero h1::after{ width:48%; }
+    header{ padding:0 14px; height:64px; }
+    .hero{ padding-top:96px; min-height: calc(100vh - 64px - 96px - 120px); }
+  }
+
+  @media (max-width:560px){
+    .slide img{ height:220px; }
+    .hero p{ font-size:0.98rem; padding:0 10px; }
+  }
+
+  /* small utility */
+  .muted{ color:var(--muted); font-size:0.95rem; }
+  .gap{ height:36px; }
+/* Background pictures slideshow */
+  .bg-slideshow {
+    position: fixed;
+    inset: 0;
+    z-index: -1; /* behind particles and content */
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .bg-slideshow::after{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(120% 120% at 50% 20%, rgba(0,6,16,0.15), rgba(0,6,16,0.65) 55%, rgba(0,6,16,0.85));
+    mix-blend-mode: multiply;
+    pointer-events:none;
+  }
+  .bg-slideshow .slide {
+    position: absolute;
+    inset: -2%;
+    background: var(--bg) center / cover no-repeat;
+    filter: saturate(1.05) contrast(1.06) brightness(0.9);
+    opacity: 1;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND SLIDESHOW (fixed, behind everything) -->
+<div class="bg-slideshow" aria-hidden="true">
+  <div class="slide" style="--i:1; --bg:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1920&auto=format&fit=crop'); --dur:36s; --delay:7s"></div>
+  <div class="slide" style="--i:2; --bg:url('https://images.unsplash.com/photo-1520975922284-5f5733b2c8f8?q=80&w=1920&auto=format&fit=crop'); --dur:36s; --delay:7s"></div>
+  <div class="slide" style="--i:3; --bg:url('https://images.unsplash.com/photo-1526481280698-8fcc13fd5f22?q=80&w=1920&auto=format&fit=crop'); --dur:36s; --delay:7s"></div>
+  <div class="slide" style="--i:4; --bg:url('https://images.unsplash.com/photo-1518779551563-7d3c1a4f9b1a?q=80&w=1920&auto=format&fit=crop'); --dur:36s; --delay:7s"></div>
+</div>
+
+<!-- PART: particle canvas -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- neon floating shapes -->
+<div class="neon-shape shape-a" aria-hidden="true"></div>
+<div class="neon-shape shape-b" aria-hidden="true"></div>
+<div class="neon-shape shape-c" aria-hidden="true"></div>
+
+<!-- SIDEBAR OVERLAY -->
+<div id="overlay" class="overlay" tabindex="-1" aria-hidden="true"></div>
+
+<!-- SIDEBAR (Option B - dark futuristic) -->
+<aside id="sidebar" class="sidebar" aria-hidden="true" aria-labelledby="sidebarTitle" role="dialog">
+  <div class="top">
+    <div class="brand-mini" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="0" y="0" width="100%" height="100%" rx="6" fill="url(#g2)"></rect><defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#00ffff"/><stop offset="1" stop-color="#8affc1"/></linearGradient></defs></svg>
+    </div>
+    <div>
+      <h3 id="sidebarTitle">AI Companion</h3>
+      <div class="muted" style="font-size:0.85rem;">Design • Convert • Export</div>
+    </div>
+  </div>
+
+  <nav class="nav" aria-label="Main navigation">
+    <a href="#heroTitle" class="nav-link" data-name="Home">
+      <span class="icon" aria-hidden="true">
+        <!-- home svg -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span>Home</span>
+    </a>
+
+    <a href="/index.html" class="nav-link" data-name="Create">
+      <span class="icon" aria-hidden="true">
+        <!-- plus/create svg -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span>Create</span>
+    </a>
+
+    <a href="#features" class="nav-link" data-name="Projects">
+      <span class="icon" aria-hidden="true">
+        <!-- folder/projects svg -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span>Projects</span>
+    </a>
+
+    {% if logged_in %}
+    <a href="/logout" class="nav-link" data-name="Logout">
+    {% else %}
+    <a href="/login" class="nav-link" data-name="Login">
+    {% endif %}
+
+      <span class="icon" aria-hidden="true">
+        <!-- login svg -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 17l5-5-5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 12H3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span>Login</span>
+    </a>
+  </nav>
+
+  <button id="themeToggle" class="btn" aria-pressed="false" title="Toggle dark / light mode" style="width:100%; justify-content:center;">
+    🌗 Theme
+  </button>
+
+  <div class="spacer" aria-hidden="true"></div>
+
+  {% if logged_in %}
+  <a href="/logout" class="login-btn" id="sidebarLogin">Logout</a>
+  {% else %}
+  <a href="/login" class="login-btn" id="sidebarLogin">Login</a>
+  {% endif %}
+
+</aside>
+
+<!-- HEADER -->
+<header role="banner">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <!-- MENU TOGGLE -->
+    <button id="menuToggle" aria-label="Open menu" aria-haspopup="true" aria-expanded="false" class="btn">
+      <span id="menuIcon">☰</span>
+    </button>
+
+    <div class="brand">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="filter:drop-shadow(0 6px 12px rgba(0,0,0,.45));">
+        <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#g)"></rect>
+        <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#00ffff"/><stop offset="1" stop-color="#8affc1"/></linearGradient></defs>
+      </svg>
+      <h2>AI Companion</h2>
+    </div>
+  </div>
+
+  <div class="controls">
+    {% if logged_in %}
+        <a class="btn" href="/logout" role="button" style="border:1px solid var(--glass-border);">
+          Logout
+        </a>
+    {% else %}
+        <a class="btn accent" id="getStartedBtn" href="/login" role="button">
+          Get Started
+        </a>
+    {% endif %}
+</div>
+
+</header>
+
+<!-- MAIN -->
+<main role="main">
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="heroTitle">
+    <h1 id="heroTitle">AI Companion — Design to Code, Instantly</h1>
+    <p class="muted">✨ “Design, generate, and launch production-ready websites instantly — UI/UX + Code + AI, all in one platform.”</p>
+
+    <div class="hero-row" aria-hidden="true">
+      <a class="btn" href="#features">See our Future</a>
+    </div>
+  </section>
+
+  <div class="gap" aria-hidden="true"></div>
+
+  <!-- FEATURES (multiple blocks with carousel) -->
+  <section id="features" class="features" aria-labelledby="featuresHeading">
+    <h2 id="featuresHeading" style="display:none;">Features</h2>
+
+    <!-- FEATURE BLOCK 1 -->
+    <article class="feature" data-reveal>
+      <div class="text">
+        <h3>Picture Perfect UI</h3>
+        <p>Upload any screenshot and get a near pixel-perfect UI preview. Our detection identifies blocks, cards, text, buttons and spacing automatically.</p>
+      </div>
+
+     
+    </article>
+
+    <!-- FEATURE BLOCK 2 -->
+    <article class="feature" data-reveal>
+      <div class="text">
+        <h3>AI Layout Detection</h3>
+        <p>Our AI tags UI elements and exports structure as HTML/CSS or React components — preserving proportions and responsive behavior.</p>
+      </div>
+
+    </article>
+
+    <!-- FEATURE BLOCK 3 -->
+    <article class="feature" data-reveal>
+      <div class="text">
+        <h3>Automatic Code Conversion</h3>
+        <p>Export to HTML, React, Tailwind or Bootstrap with a single click. You can fine-tune component props before downloading code.</p>
+      </div>
+
+     
+    </article>
+  </section>
+
+  <div style="height:120px"></div>
+
+  <!-- PROJECTS SECTION -->
+  <section id="projects" class="features" aria-labelledby="projectsHeading">
+    <div id="projectList" style="margin-top:30px;">
+      <h2 style="color:white;">Your Projects</h2>
+      <div id="projectsContainer" 
+          style="display:flex; flex-wrap:wrap; gap:20px; margin-top:15px;">
+      </div>
+    </div>
+
+
+    <h2 id="projectsHeading" style="color:white;">Your Projects</h2>
+
+    <div id="projectsContainer" style="padding: 10px;"></div>
+  </section>
+
+
+
+</main>
+
+<script>
+/* ----------------------------
+   Theme toggle (persist)
+   ---------------------------- */
+(function(){
+  const body = document.body;
+  const btn = document.getElementById('themeToggle');
+
+  function applyTheme(theme){
+    if(theme === 'light'){
+      body.classList.add('light');
+      btn.setAttribute('aria-pressed','true');
+      btn.textContent = '☀️ Light';
+    } else {
+      body.classList.remove('light');
+      btn.setAttribute('aria-pressed','false');
+      btn.textContent = '🌙 Dark';
+    }
+  }
+
+  const saved = localStorage.getItem('ai_companion_theme') || 'dark';
+  applyTheme(saved);
+
+  btn.addEventListener('click', ()=>{
+    const next = body.classList.contains('light') ? 'dark' : 'light';
+    localStorage.setItem('ai_companion_theme', next);
+    applyTheme(next);
+  });
+})();
+
+/* ----------------------------
+   Simple particle system
+   ---------------------------- */
+(function(){
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = innerWidth;
+  let h = canvas.height = innerHeight;
+  const particles = [];
+  const count = Math.round((w*h) / 70000); // density
+
+  function rand(min,max){ return Math.random()*(max-min)+min; }
+
+  function Particle(){
+    this.x = rand(0,w); this.y = rand(0,h);
+    this.vx = rand(-0.2,0.6); this.vy = rand(-0.1,0.3);
+    this.size = rand(0.6,2.2);
+    this.alpha = rand(0.06,0.25);
+    this.t = rand(0,Math.PI*2);
+    this.color = (Math.random()>0.7) ? 'rgba(138,255,193,'+this.alpha+')' : 'rgba(0,255,255,'+this.alpha+')';
+  }
+  function init(){ particles.length=0; for(let i=0;i<count;i++) particles.push(new Particle()); }
+  function resize(){ w = canvas.width = innerWidth; h = canvas.height = innerHeight; init(); }
+  addEventListener('resize', resize);
+  init();
+
+  function frame(){
+    ctx.clearRect(0,0,w,h);
+    for(let p of particles){
+      p.t += 0.01;
+      p.x += p.vx + Math.sin(p.t)*0.15;
+      p.y += p.vy;
+      if(p.x > w+40) p.x = -40;
+      if(p.x < -40) p.x = w+40;
+      if(p.y > h+40) p.y = -40;
+
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.ellipse(p.x,p.y, p.size*2, p.size, 0,0,Math.PI*2);
+      ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ----------------------------
+   Scroll reveal for features
+   ---------------------------- */
+(function(){
+  const items = document.querySelectorAll('[data-reveal]');
+  function reveal(){
+    const windowH = window.innerHeight;
+    items.forEach(item=>{
+      const rect = item.getBoundingClientRect();
+      if(rect.top < windowH - 80) item.classList.add('show');
+    });
+  }
+  addEventListener('scroll', reveal);
+  addEventListener('resize', reveal);
+  reveal();
+})();
+
+/* ----------------------------
+   Carousel: per-carousel logic
+   - autoplay
+   - arrows
+   - dots
+   ---------------------------- */
+(function(){
+  function setupCarousel(carouselEl, opts={}){
+    const slidesWrap = carouselEl.querySelector('.slides');
+    const slides = Array.from(slidesWrap.children);
+    const left = carouselEl.querySelector('.arrow.left');
+    const right = carouselEl.querySelector('.arrow.right');
+    const dotsWrap = carouselEl.querySelector('.dots');
+
+    let index = 0;
+    const total = slides.length;
+    let width = carouselEl.clientWidth;
+    let autoplay = opts.autoplay ?? true;
+    let delay = opts.delay ?? 3500;
+    let timer = null;
+
+    // create dots
+    slides.forEach((s,i)=>{
+      const d = document.createElement('button');
+      d.className = 'dot';
+      d.setAttribute('aria-label','Go to slide '+(i+1));
+      if(i===0) d.classList.add('active');
+      dotsWrap.appendChild(d);
+      d.addEventListener('click', ()=> go(i) );
+    });
+
+    function refreshWidth(){ width = carouselEl.clientWidth; move(); }
+    addEventListener('resize', refreshWidth);
+
+    function move(){
+      slidesWrap.style.transform = `translateX(-${index * width}px)`;
+      slides.forEach((s,i)=> s.classList.toggle('active', i===index));
+      const ds = dotsWrap.querySelectorAll('.dot');
+      ds.forEach((d,i)=> d.classList.toggle('active', i===index));
+    }
+
+    function next(){
+      index = (index + 1) % total;
+      move();
+    }
+    function prev(){
+      index = (index - 1 + total) % total;
+      move();
+    }
+    function go(i){
+      index = i % total;
+      move();
+      restart();
+    }
+    function restart(){
+      if(timer) clearInterval(timer);
+      if(autoplay) timer = setInterval(next, delay);
+    }
+
+    // arrows
+    if(left) left.addEventListener('click', ()=>{ prev(); restart(); });
+    if(right) right.addEventListener('click', ()=>{ next(); restart(); });
+
+    // keyboard accessibility
+    carouselEl.addEventListener('keydown', e=>{
+      if(e.key === 'ArrowLeft') prev();
+      if(e.key === 'ArrowRight') next();
+    });
+
+    move();
+    restart();
+  }
+
+  // init all carousels on page
+  document.querySelectorAll('.carousel').forEach(c=> setupCarousel(c, { autoplay:true, delay:3800 }));
+})();
+
+/* ----------------------------
+   Smooth Scroll on Get Started (already via anchor) + focus
+   ---------------------------- */
+(function(){
+  const anchor = document.getElementById('getStartedBtn');
+  if(anchor){
+    anchor.addEventListener('click', (e)=>{
+      // let browser handle href anchor; ensure first focus for accessibility
+      const target = document.querySelector(anchor.getAttribute('href'));
+      if(target){
+        setTimeout(()=> target.setAttribute('tabindex','-1') , 600);
+      }
+    });
+  }
+})();
+
+/* ----------------------------
+   Sidebar toggle + accessibility
+   ---------------------------- */
+(function(){
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const firstFocusable = sidebar.querySelector('.nav a') || sidebar.querySelector('#sidebarLogin');
+  const focusable = sidebar.querySelectorAll('a, button, [tabindex]');
+
+  function openSidebar(){
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+    sidebar.setAttribute('aria-hidden','false');
+    menuToggle.setAttribute('aria-expanded','true');
+    // save previously focused element
+    sidebar._prevFocus = document.activeElement;
+    // focus first focusable
+    if(firstFocusable) firstFocusable.focus();
+    // prevent body scroll (small)
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  function closeSidebar(){
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+    sidebar.setAttribute('aria-hidden','true');
+    menuToggle.setAttribute('aria-expanded','false');
+    // restore focus
+    if(sidebar._prevFocus) sidebar._prevFocus.focus();
+    document.documentElement.style.overflow = '';
+  }
+
+  menuToggle.addEventListener('click', (e)=>{
+    const isOpen = sidebar.classList.contains('open');
+    if(isOpen) closeSidebar(); else openSidebar();
+  });
+
+  // close when clicking overlay
+  overlay.addEventListener('click', closeSidebar);
+
+  // close when pressing ESC
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && sidebar.classList.contains('open')) {
+      closeSidebar();
+    }
+    // trap focus inside sidebar while open
+    if(e.key === 'Tab' && sidebar.classList.contains('open')){
+      const nodes = Array.from(focusable);
+      if(nodes.length === 0) return;
+      const first = nodes[0], last = nodes[nodes.length -1];
+      if(e.shiftKey && document.activeElement === first){
+        e.preventDefault();
+        last.focus();
+      } else if(!e.shiftKey && document.activeElement === last){
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  // close when a sidebar link is clicked (and allow anchor navigation)
+  sidebar.querySelectorAll('.nav a, #sidebarLogin').forEach(link=>{
+    link.addEventListener('click', (e)=>{
+      // small timeout so anchor navigation works before closing
+      setTimeout(()=> closeSidebar(), 120);
+    });
+  });
+
+  // ensure overlay hides on resize if necessary
+  window.addEventListener('resize', ()=> {
+    if(window.innerWidth > 1400 && sidebar.classList.contains('open')) {
+      // keep open — nothing special
+    }
+  });
+})();
+
+
+
+/* ----------------------------
+   Load User Projects
+   ---------------------------- */
+(function() {
+  const container = document.getElementById("projectsContainer");
+  if (!container) return;
+
+  fetch("/api/projects")
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success || data.projects.length === 0) {
+        container.innerHTML = "<p style='color:white;'>No projects yet.</p>";
+        return;
+      }
+
+      container.innerHTML = data.projects
+        .map(p => `
+          <div style="
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            backdrop-filter: blur(6px);
+          ">
+            <h3 style="margin:0;color:white;">${p.title}</h3>
+            <p style="margin:6px 0;color:#ccc;">Updated: ${new Date(p.updated_at).toLocaleString()}</p>
+            <a class="btn" href="/index.html?project_id=${p._id}">Open Project</a>
+          </div>
+        `)
+        .join("");
+    });
+})();
+
+
+  async function loadProjects() {
+      const response = await fetch("/api/projects");
+      const data = await response.json();
+
+      if (!data.success) return;
+
+      const container = document.getElementById("projectsContainer");
+      container.innerHTML = "";
+
+      if (data.projects.length === 0) {
+          container.innerHTML = "<p style='color:white;'>No projects yet.</p>";
+          return;
+      }
+
+      data.projects.forEach(p => {
+          const card = document.createElement("div");
+          card.style = `
+              width:220px; padding:15px;
+              background:rgba(255,255,255,0.1);
+              border-radius:10px;
+              border:1px solid rgba(255,255,255,0.2);
+              cursor:pointer;
+          `;
+          card.innerHTML = `
+              <h3 style="color:white;">${p.title}</h3>
+              <p style="color:#ccc; font-size:14px;">Last updated</p>
+          `;
+          card.onclick = () => {
+              window.location.href = "/index.html?project_id=" + p._id;
+          };
+          container.appendChild(card);
+      });
+  }
+
+  loadProjects();
+
+
+
+</script>
+
+</body>
+</html>
