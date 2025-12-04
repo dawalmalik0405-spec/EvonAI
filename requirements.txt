@@ -5,9 +5,5 @@ python-dotenv==1.0.0
 Werkzeug==3.0.1
 requests==2.31.0
 gunicorn==21.2.0
-
-# Optional but recommended (your AI-related workflow)
 openai==1.3.7
-
-# If using bson ObjectId via pymongo (safe)
 dnspython==2.4.2
