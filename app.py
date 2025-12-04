@@ -236,7 +236,9 @@ def list_projects():
 # --------------------------------------
 # 🗂 MongoDB Connection
 # --------------------------------------
-mongo = MongoClient("mongodb+srv://Mdsaifali:Saif6343@saif1.n5mqz1l.mongodb.net/whiteboard2web")
+import os
+mongo = MongoClient(os.getenv("MONGO_URI"))
+
 db = mongo["whiteboard2web"]
 users_col = db["users"]
 projects_col = db["projects"]
@@ -246,3 +248,4 @@ projects_col = db["projects"]
 # --------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
